@@ -6,5 +6,7 @@
 #include <string.h>
 #include <sys/wait.h>
 
+int main(void);
+
 
 #endif
