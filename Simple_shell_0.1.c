@@ -28,9 +28,9 @@ int main(void)
 	}
 	else if (childpid == 0)
 	{
-		char *const args[] = {"sh", "my_shell", NULL};
+		char *const args[] = {"hsh", "my_shell", NULL};
 
-		execve("/bin/sh", args, NULL);
+		execve("/bin/hsh", args, NULL);
 		perror("execve failed");
 		return (1);
 	}
@@ -42,7 +42,6 @@ int main(void)
 		{
 			fputs(command, stdout);
 		}
-		write(STDOUT_FILENO, "$ ", 2);
 	}
 	fclose(my_shell);
 	return (0);
