@@ -29,9 +29,9 @@ int main(void)
 		}
 		else if (childpid == 0)
 		{	
-			char *const args[] = {"hsh", "my_shell", NULL};
+			char *const args[] = {"ls", NULL};
 
-			execve("/bin/hsh", args, NULL);
+			execve("/bin/ls", args, NULL);
 			perror("execve failed");
 			return (1);
 		}
