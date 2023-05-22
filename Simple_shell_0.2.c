@@ -1,8 +1,5 @@
 #include "main.h"
-<<<<<<< HEAD
 
-=======
->>>>>>> 7ea286bc5a587db366b7a2fb4dc622005279ac9e
 #define MAX_ARGS 100
 /**
  * main - handle  arguments
@@ -11,7 +8,7 @@
  */
 int main(void)
 {
-<<<<<<< HEAD
+
         char *argv[MAX_ARGS];
         int argc = MAX_ARGS;
         int i;
@@ -32,7 +29,7 @@ int main(void)
         }
         fclose(Fl);
         return (0);
-=======
+
 	char *argv[MAX_ARGS];
 	int argc = MAX_ARGS;
 	int i;
@@ -53,5 +50,5 @@ int main(void)
 	}
 	fclose(Fl);
 	return (0);
->>>>>>> 7ea286bc5a587db366b7a2fb4dc622005279ac9e
+
 }
