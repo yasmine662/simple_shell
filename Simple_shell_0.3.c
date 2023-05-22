@@ -1,4 +1,4 @@
-#include "main.h"
+#include "shell.h"
 #include <errno.h>
 
 #define MAX_COMMAND_LENGTH 100
@@ -22,6 +22,7 @@ int main(void)
 		{
 			return (1);
 		}
+			childpid = fork();
 			if (childpid < 0)
 			{
 				childpid = fork();
@@ -46,7 +47,7 @@ int main(void)
 		{
 			return (0);
 		}
-	fclose(Fl);
+		fclose(Fl);
 	}
 	if (Fl == NULL)
 		{

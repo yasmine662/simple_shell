@@ -1,4 +1,4 @@
-#include "main.h"
+#include "shell.h"
 
 #define MAX_ARGS 100
 /**
@@ -9,37 +9,16 @@
 int main(void)
 {
 
-        char *argv[MAX_ARGS];
-        int argc = MAX_ARGS;
-        int i;
-
-        FILE *Fl = fopen("handlearg.txt", "w");
-
-        if (Fl == NULL)
-        {
-                perror("opening Fl failed");
-                return (1);
-        }
-        for (i = 0; i < argc; i++)
-        {
-                if (argv[i] != NULL)
-                {
-                        fwrite(argv[i], sizeof(char), 1, Fl);
-                }
-        }
-        fclose(Fl);
-        return (0);
-
 	char *argv[MAX_ARGS];
 	int argc = MAX_ARGS;
 	int i;
 
-	FILE *Fl = fopen("handlearg.txt", "w");
+	FILE *Fl = fopen("shell_0.2", "r");
 
 	if (Fl == NULL)
 	{
 		perror("opening Fl failed");
-		return (19);
+		return (1);
 	}
 	for (i = 0; i < argc; i++)
 	{
@@ -50,5 +29,4 @@ int main(void)
 	}
 	fclose(Fl);
 	return (0);
-
 }
