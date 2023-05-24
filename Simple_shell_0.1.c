@@ -17,6 +17,7 @@ int main(void)
 	char const prompt[] = "#cisfun$ ";
 	int  length = 0;
 	pid_t childpid;
+	char *args[3];
 
 	while (1)
 	{
@@ -40,20 +41,18 @@ int main(void)
 		}
 	if (childpid == 0)
 	{
-		if (access(command, X_OK) == 0)
-		{
-			char *args[3];
-
-			args[0] = "command";
-			args[1] = "NULL";
-
-			if (execve(args[0], args, NULL) == -1)
 			{
 				write(STDERR_FILENO, "./shell: ", 9);
 				write(STDERR_FILENO, ": No such file or directory\n", 28);
 				return (1);
 			}
-		}
+		args[0] = "command";
+		args[1] = "NULL";
+
+		if (execve(args[0], args, NULL) == -1)
+			{
+				return (0);
+			}
 	}
 	else
 			wait(NULL);

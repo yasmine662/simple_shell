@@ -43,12 +43,17 @@ int main(void)
 		}
 		if (childpid == 0)
 		{
-			char *argv[2];
+			char *argv[4];
+			char * envp[] = { NULL };
 
-			argv[0] = "/bin/hsh";
-			argv[1] = "NULL";
+			argv[0] = "sh";
+			argv[1] = "-c";
+			argv[2] = command;
+			argv[3] = NULL;
 
-			execve("/bin/hsh", argv, NULL);
+
+			execve("sh", argv, envp);
+			
 			system(command);
 			return (1);
 		}

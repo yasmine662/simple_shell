@@ -24,16 +24,26 @@ int main(void)
 	char cmd[] = "qwerty";
 	char error_message[] = "./hsh: 1: ";
 	char not_found_message[] = ": not found";
+	ssize_t bytesRead;
 	pid_t childpid;
 	signal(SIGINT, handleSignal);
 
 	while (1)
 	{
 		if (isatty(STDIN_FILENO))
-		write(STDOUT_FILENO, prompt, sizeof(prompt) - 1);
-		if (fgets(command, sizeof(command), stdin) == NULL)
+			write(STDOUT_FILENO, prompt, sizeof(prompt) - 1);
+
+	bytesRead = read(STDIN_FILENO, command, sizeof(command));
+		if (bytesRead == -1)
 		{
+			perror("Error reading input");
 			break;
+		}
+		else if (bytesRead == 0)
+		{
+			const char endOfFileMessage[] = "\nEnd of file reached. Exiting...\n";
+			write(STDOUT_FILENO, endOfFileMessage, sizeof(endOfFileMessage) - 1);
+			return (0);
 		}
 	childpid = fork();
 		if (childpid < 0)
@@ -50,20 +60,16 @@ int main(void)
 
 			execve("/bin/hsh", argv, NULL);
 			system(command);
+			write(STDOUT_FILENO, error_message, sizeof(error_message) - 1);
+			write(STDOUT_FILENO, cmd, sizeof(cmd) - 1);
+			write(STDOUT_FILENO, not_found_message, sizeof(not_found_message) - 1);
+			write(STDOUT_FILENO, "\n", 1);
 			return (1);
 		}
 		else
 		{
 			wait(NULL);
 		}
-	}
-	if (1)
-	{
-		write(STDOUT_FILENO, error_message, sizeof(error_message) - 1);
-		write(STDOUT_FILENO, cmd, sizeof(cmd) - 1);
-		write(STDOUT_FILENO, not_found_message, sizeof(not_found_message) - 1);
-		write(STDOUT_FILENO, "\n", 1);
-		return (1);
 	}
 	return (0);
 }
