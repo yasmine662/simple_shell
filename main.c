@@ -1,10 +1,20 @@
 #include "shell.h"
-
+#include "signal.h"
 /**
  * main - first step in creation hsh program
  *
  * Return: always(0)
  */
+
+void handleSignal(int signal)
+{
+	if (signal == SIGINT)
+	{
+		const char message[] = "Ctrl+C (SIGINT) received. Ignoring...\n";
+	
+        	write(STDOUT_FILENO, message, sizeof(message) - 1);
+	}
+}
 
 int main(void)
 {
@@ -14,6 +24,7 @@ int main(void)
 	char error_message[] = "./hsh: 1: ";
 	char not_found_message[] = ": not found";
 	pid_t childpid;
+	signal(SIGINT, handleSignal);
 
 	while (1)
 	{
