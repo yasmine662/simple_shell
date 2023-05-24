@@ -19,52 +19,44 @@ int main(void)
 	pid_t childpid;
 
 	while (1)
-        {
-        write(STDOUT_FILENO, prompt, sizeof(prompt) - 1);
-  
-	if (fgets(command, sizeof(command), stdin) == NULL)
 	{
-	break;
-	}
-
+	write(STDOUT_FILENO, prompt, sizeof(prompt) - 1);
+		if (fgets(command, sizeof(command), stdin) == NULL)
+			break;
 	length = 0;
-	while (command[length] != '\0' && command[length] != '\n')
+	if(command[length] != '\0' && command[length] != '\n')
 	{
 		length++;
-	}
-        if (length == 0 || (length == 1 && command[0] == '\n'))
-	{
-		break;
-	}
-        if (command[length - 1] == '\n')
-	{
-		command[length - 1] = '\0';
+		if (length == 0 || (length == 1 && command[0] == '\n'))
+			break;
+		if (command[length - 1] == '\n')
+			command[length - 1] = '\0';
 	}
 	childpid = fork();
-
 		if (childpid < 0)
 		{
 			perror("process to create failed");
 			return (1);
 		}
-		else 
-		if (childpid == 0)
+	if (childpid == 0)
+	{
+		if (access(command, X_OK) == 0)
 		{
-			char *args[2];
-			args[0] = "/bin/ls";
+			char *args[3];
+
+			args[0] = "command";
 			args[1] = "NULL";
-			
-			if (execve(command, args, NULL) == -1)
+
+			if (execve(args[0], args, NULL) == -1)
 			{
 				write(STDERR_FILENO, "./shell: ", 9);
 				write(STDERR_FILENO, ": No such file or directory\n", 28);
-                        	return (1);
+				return (1);
 			}
-                }
-		else
-		{
-			wait(NULL);
 		}
+	}
+	else
+			wait(NULL);
 	}
 	return (0);
 }
