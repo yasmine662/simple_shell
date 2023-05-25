@@ -42,33 +42,26 @@ int main(void)
 			return (1);
 		}
 		if (childpid == 0)
-		{
-			char *argv[4];
-			char * envp[] = { NULL };
-
-			argv[0] = "sh";
-			argv[1] = "-c";
-			argv[2] = command;
-			argv[3] = NULL;
-
-
-			execve("sh", argv, envp);
+		{	
+			char *argv[2];
 			
 			system(command);
-			return (1);
+                        argv[0] = "./hsh";
+                        argv[1] = "NULL";
+                        execve("./hsh", argv, NULL);
+			{
+			       	write(STDERR_FILENO, error_message, sizeof(error_message) - 1);
+                                write(STDERR_FILENO, cmd, sizeof(cmd) - 1);
+                                write(STDERR_FILENO, not_found_message, sizeof(not_found_message) - 1);
+                       		write(STDERR_FILENO, "\n", 1);
+				return (1);
+			}
+			return (0);
 		}
 		else
 		{
 			wait(NULL);
 		}
-	}
-	if (1)
-	{
-		write(STDOUT_FILENO, error_message, sizeof(error_message) - 1);
-		write(STDOUT_FILENO, cmd, sizeof(cmd) - 1);
-		write(STDOUT_FILENO, not_found_message, sizeof(not_found_message) - 1);
-		write(STDOUT_FILENO, "\n", 1);
-		return (1);
 	}
 	return (0);
 }
