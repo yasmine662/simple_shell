@@ -11,7 +11,7 @@
 
 void read_command(char *buffer);
 char **parse_command(char *buffer);
-int execute_command(char **args)
+int execute_command(char **args);
 
 int main(void)
 {

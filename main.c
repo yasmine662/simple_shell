@@ -1,6 +1,8 @@
 #include "shell.h"
 #include "signal.h"
 #include "stdbool.h"
+#define MAX_ARGS 128
+
 /**
  * main - first step in creation hsh program
  *
@@ -35,29 +37,35 @@ int main(void)
 		{
 			break;
 		}
+	char *args[MAX_ARGS];
+        int arg_count = 0;
+        char *token = strtok(command, " \t\n");
+        
+	while (token != NULL && arg_count < MAX_ARGS - 1)
+        {
+            args[arg_count] = token;
+            arg_count++;
+            token = strtok(NULL, " \t\n");
+        }
+	args[arg_count] = NULL;
+
 	childpid = fork();
+
 		if (childpid < 0)
 		{
 			perror("process to create failed");
 			return (1);
 		}
 		if (childpid == 0)
-		{	
-			char *argv[2];
-			
-			system(command);
-                        argv[0] = "./hsh";
-                        argv[1] = "NULL";
-                        execve("./hsh", argv, NULL);
-			{
-			       	write(STDERR_FILENO, error_message, sizeof(error_message) - 1);
-                                write(STDERR_FILENO, cmd, sizeof(cmd) - 1);
-                                write(STDERR_FILENO, not_found_message, sizeof(not_found_message) - 1);
-                       		write(STDERR_FILENO, "\n", 1);
-				return (1);
-			}
-			return (0);
-		}
+		{
+                        execvp(args[0], args);
+	
+		       	write(STDERR_FILENO, error_message, sizeof(error_message) - 1);
+                        write(STDERR_FILENO, cmd, sizeof(cmd) - 1);
+                        write(STDERR_FILENO, not_found_message, sizeof(not_found_message) - 1);
+                  	write(STDERR_FILENO, "\n", 1);
+			return (1);
+		}	
 		else
 		{
 			wait(NULL);

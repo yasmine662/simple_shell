@@ -1,73 +1,148 @@
-#include <sys/types.h>
-#include <sys/wait.h>
-#include <unistd.h>
-#include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+#include <fcntl.h>
 
-void handleSignal(int signal)
-{
-    if (signal == SIGINT)
-    {
-        const char message[] = "Ctrl+C (SIGINT) received. Ignoring...\n";
+#define BUFFER_SIZE 1024
+#define TOKEN_DELIMITER " \t\r\n\a"
 
-        write(STDOUT_FILENO, message, sizeof(message) - 1);
-    }
-}
+void read_command(char *buffer);
+char **parse_command(char *buffer);
+int execute_command(char **args);
 
 int main(void)
 {
-    char command[1024];
-    char const prompt[] = "($) ";
-    char cmd[] = "qwerty";
-    char error_message[] = "./hsh: 1: ";
-    char not_found_message[] = ": not found";
-    pid_t childpid;
-    signal(SIGINT, handleSignal);
+    char buffer[BUFFER_SIZE];
+    char **args;
+    int status;
+    
 
     while (1)
     {
-        if (isatty(STDIN_FILENO))
-            write(STDOUT_FILENO, prompt, sizeof(prompt) - 1);
-        if (fgets(command, sizeof(command), stdin) == NULL)
-        {
-            break;
-        }
-        childpid = fork();
-        if (childpid < 0)
-        {
-            perror("process to create failed");
-            return (1);
-        }
-        if (childpid == 0)
-        {
-            char *argv[2];
-            
-            char path[1024];
-            getcwd(path, sizeof(path)); // Get the current working directory
+	{
+        write(STDOUT_FILENO, "$ ", 2);
+        read_command(buffer);
+        args = parse_command(buffer);
+        status = execute_command(args);
 
-            system(command);
-            argv[0] = "./hsh";
-            argv[1] = NULL;
-            execve("./hsh", argv, NULL);
-            {
-                write(STDERR_FILENO, error_message, sizeof(error_message) - 1);
-                write(STDERR_FILENO, cmd, sizeof(cmd) - 1);
-                write(STDERR_FILENO, not_found_message, sizeof(not_found_message) - 1);
-                write(STDERR_FILENO, "\n", 1);
-                return (1);
-            }
-            return (0);
-        }
-        else
-        {
-            // Parent process
-            int status;
-            waitpid(childpid, &status, 0);
-            // Optionally, you can check the status and handle it if needed
-        }
+        free(args);
+
+        if (status == 0)
+            break;
     }
 
     return 0;
+}
+
+void read_command(char *buffer)
+{
+    fgets(buffer, BUFFER_SIZE, stdin);
+}
+
+char **parse_command(char *buffer) 
+{
+    int buffer_size = BUFFER_SIZE;
+    int position = 0;
+    char **tokens = malloc(buffer_size * sizeof(char *));
+    char *token;
+
+    if (!tokens) {
+        write(STDERR_FILENO, "Memory allocation error\n", 24);
+        exit(EXIT_FAILURE);
+    }
+
+    token = strtok(buffer, TOKEN_DELIMITER);
+    while (token != NULL) {
+        tokens[position] = token;
+        position++;
+
+        if (position >= buffer_size)
+       	{
+            buffer_size += BUFFER_SIZE;
+            tokens = realloc(tokens, buffer_size * sizeof(char *));
+            if (!tokens) {
+                write(STDERR_FILENO, "Memory allocation error\n", 24);
+                exit(EXIT_FAILURE);
+            }
+        }
+
+        token = strtok(NULL, TOKEN_DELIMITER);
+    }
+    tokens[position] = NULL;
+
+    return tokens;
+}
+int execute_command(char **args)
+{
+
+    pid_t pid;
+    int status;
+    int pipefd[2];
+    char not_found_message[] = ": not found";
+
+
+    if (pipe(pipefd) == -1)
+    {
+        perror("pipe");
+        exit(EXIT_FAILURE);
+    }
+
+    pid = fork();
+    if (pid == 0) 
+    {
+        close(pipefd[0]);
+        dup2(pipefd[1], STDOUT_FILENO);
+        close(pipefd[1]);
+
+        execvp(args[0], args);
+	{
+	    char not_found_message[] = ": not found\n";
+
+            write(STDERR_FILENO, args[0], strlen(args[0]));
+            write(STDERR_FILENO, not_found_message, strlen(not_found_message));
+            return (1);
+	}
+    }
+    else if (pid < 0) 
+    {
+        perror("fork");
+        exit(EXIT_FAILURE);
+    } 
+    else 
+    {
+        close(pipefd[1]);
+
+        char buffer[BUFFER_SIZE];
+        ssize_t n;
+        char output[BUFFER_SIZE];
+        int output_pos = 0;
+
+        while ((n = read(pipefd[0], buffer, BUFFER_SIZE)) > 0) 
+	{
+            memcpy(output + output_pos, buffer, n);
+            output_pos += n;
+        }
+
+        close(pipefd[0]);
+
+        if (output_pos > 0) 
+	{
+            int start_index = 0;
+            while (output[start_index] != '|') 
+	    {
+                start_index++;
+            }
+            start_index++;
+
+            write(STDOUT_FILENO, output + start_index, output_pos - start_index);
+        }
+
+        waitpid(pid, &status, 0);
+	return (0);
+    }
+    return (0);
+    }
 }
