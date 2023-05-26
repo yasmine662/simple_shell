@@ -1,3 +1,4 @@
+#include "shell.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -9,9 +10,7 @@
 #define BUFFER_SIZE 1024
 #define TOKEN_DELIMITER " \t\r\n\a"
 
-void read_command(char *buffer);
-char **parse_command(char *buffer);
-int execute_command(char **args);
+
 /**
  * main - write prompt
  *

@@ -1,3 +1,4 @@
+#include <shell.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -9,9 +10,12 @@
 #define BUFFER_SIZE 1024
 #define TOKEN_DELIMITER " \t\r\n\a"
 
-void read_command(char *buffer);
-char **parse_command(char *buffer);
-int execute_command(char **args);
+
+/**
+ * main - write prompt
+ *
+ * Return: always 0
+ */
 
 int main(void)
 {
@@ -32,15 +36,26 @@ int main(void)
 		break;
 	}
 
-	return 0;
+	return (0);
 }
+
+/**
+ * read_command - function that read command
+ * @buffer: which coontent data
+ * Return: always 0
+ */
 
 void read_command(char *buffer)
 {
 	fgets(buffer, BUFFER_SIZE, stdin);
 }
+/**
+ * parse_command - function  toknization
+ * @buffer: which content data
+ * Return: always 0
+ */
 
-char **parse_command(char *buffer) 
+char **parse_command(char *buffer)
 {
 	int buffer_size = BUFFER_SIZE;
 	int position = 0
@@ -57,7 +72,7 @@ char **parse_command(char *buffer)
 	while (token != NULL)
 	{
 	tokens[position] = token;
-        position++;
+	position++;
 
 	if (position >= buffer_size)
 	{
@@ -74,8 +89,13 @@ char **parse_command(char *buffer)
 	}
 	tokens[position] = NULL;
 
-	return tokens;
+	return (tokens);
 }
+/**
+ * execute_command - function that execute command
+ * @args: argument entred
+ * Return: always 0
+ */
 int execute_command(char **args)
 {
 	pid_t pid;
@@ -91,7 +111,7 @@ int execute_command(char **args)
 	}
 
 	pid = fork();
-	if (pid == 0) 
+	if (pid == 0)
 	{
 	close(pipefd[0]);
 	dup2(pipefd[1], STDOUT_FILENO);
@@ -106,12 +126,12 @@ int execute_command(char **args)
 		return (1);
 	}
 	}
-	else if (pid < 0) 
+	else if (pid < 0)
 	{
 		perror("fork");
 		exit(EXIT_FAILURE);
-	} 
-	else 
+	}
+	else
 	{
 	close(pipefd[1]);
 
@@ -131,8 +151,8 @@ int execute_command(char **args)
 	if (output_pos > 0)
 	{
 		int start_index = 0;
-	while (output[start_index] != '|') 
-		
+	while (output[start_index] != '|')
+	{
 		{
 			start_index++;
 		}

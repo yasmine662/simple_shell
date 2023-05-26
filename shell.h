@@ -7,5 +7,8 @@
 #include <sys/wait.h>
 
 int main(void);
+void read_command(char *buffer);
+char **parse_command(char *buffer);
+int execute_command(char **args);
 
 #endif
